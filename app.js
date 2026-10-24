@@ -31,6 +31,19 @@
   };
   var CATPHOTO = { food: 'bread', stuff: 'box', slot: 'lecture', book: 'book', help: 'scissors' };
   /* 真实照片：t=卡片 4:3 / b=详情 16:9 */
+
+  function guessPhoto(t, cat) {
+    var s = String(t || '');
+    if (/袋|布|衣|衫|帽/.test(s)) return 'shirt';
+    if (/书|教材|资料|笔记|讲义/.test(s)) return 'book';
+    if (/面包|蛋糕|饭|餐|食|水果|橘/.test(s)) return 'bread';
+    if (/奶茶|咖啡|饮|水/.test(s)) return 'cup';
+    if (/花|绿植|盆栽|植物/.test(s)) return 'plant';
+    if (/电脑|显示器|机房/.test(s)) return 'lab';
+    if (/简历|打印|文件/.test(s)) return 'doc';
+    return (CATPHOTO && CATPHOTO[cat]) || 'box';
+  }
+
   function photo(it, big) {
     var src = 'assets/photos/' + (it.photo || 'box') + (big ? '-b' : '-t') + '.jpg';
     return '<img class="ph" src="' + src + '" alt="" loading="lazy" decoding="async" onerror="this.style.opacity=0">';
@@ -396,7 +409,7 @@
     var cat = state.pubCat;
     var it = {
       id: 'u' + Date.now().toString(36),
-      cat: cat, icon: CATMAP[cat] ? CATMAP[cat].icon : 'box', photo: CATPHOTO[cat] || 'box',
+      cat: cat, icon: CATMAP[cat] ? CATMAP[cat].icon : 'box', photo: guessPhoto(title, cat),
       title: title,
       place: String(fd.get('place') || '').trim() || '校园内 · 私信问位置',
       dist: 60 + Math.floor(Math.random() * 380),

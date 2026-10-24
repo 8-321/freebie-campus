@@ -252,7 +252,7 @@ input,textarea{font:inherit;color:inherit}
   border-radius:0;padding:18px;background:#F7F1E4;
   border:1px solid #EBDDBF;position:relative;overflow:hidden;
 }
-.pro::after{content:"PRO";position:absolute;right:-8px;bottom:-14px;font-size:72px;font-weight:900;color:rgba(185,138,60,.1);letter-spacing:-.04em}
+.pro::after{content:none}
 .pro__t{font-size:15px;font-weight:800;margin-bottom:5px}
 .pro__d{font-size:11.5px;color:var(--ink2);line-height:1.6;margin-bottom:13px;max-width:24em}
 .pro__b{display:inline-flex;align-items:center;gap:6px;background:var(--ink);color:#F7F3E6;font-size:12px;font-weight:700;padding:9px 15px;border-radius:0}
@@ -291,7 +291,7 @@ input,textarea{font:inherit;color:inherit}
 /* ---------- 详情 sheet ---------- */
 .sheet-wrap{position:fixed;inset:0;z-index:60;display:none}
 .sheet-wrap.open{display:block}
-.backdrop{position:absolute;inset:0;background:rgba(24,23,20,.52);opacity:0;transition:opacity .3s ease}
+.backdrop{position:absolute;inset:0;background:rgba(24,23,20,.6);opacity:0;transition:opacity .3s ease}
 .sheet-wrap.open .backdrop{opacity:1}
 .sheet{
   position:absolute;left:50%;bottom:0;transform:translate(-50%,102%);width:min(440px,100%);
@@ -483,4 +483,4 @@ input,textarea{font:inherit;color:inherit}
 .sheet__art .ph{filter:saturate(.9) contrast(1.03) sepia(.04)}
 .empty .ic{opacity:.28}
 
-.claim__ini{display:grid;place-items:center;background:var(--art);color:var(--olive-d);font-size:13px;font-weight:700}
+.claim__ini{display:grid;place-items:center;background:var(--art);color:var(--olive-d);font-size:14px;font-weight:700}
