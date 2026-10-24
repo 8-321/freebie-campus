@@ -430,3 +430,7 @@ input,textarea{font:inherit;color:inherit}
 /* 左侧勾选用 CSS 画，不依赖字体符号 */
 .checks li i{width:15px;height:15px;border-radius:50%;border:1px solid rgba(110,124,82,.45);position:relative;flex:0 0 auto;margin-top:1px;font-style:normal}
 .checks li i::after{content:"";position:absolute;left:5px;top:3.4px;width:3.6px;height:6.4px;border:solid var(--olive);border-width:0 1.3px 1.3px 0;transform:rotate(40deg)}
+
+/* Pro 卖点前的小方块（替代 ✦ 字符） */
+.modal__pro li i{width:5px;height:5px;border-radius:1.4px;background:var(--olive);display:inline-block;flex:0 0 auto;margin-top:7px;transform:rotate(45deg)}
+.modal__x svg{display:block}

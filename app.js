@@ -204,7 +204,7 @@
   function feedHTML() {
     var list = filtered();
     if (!list.length) {
-      return '<div class="empty"><b>🧺</b>这里现在空着<br>换个分类，或者你自己发一条</div>' +
+      return '<div class="empty">' + svgIcon('box') + '这里现在空着<br>换个分类，或者你自己发一条</div>' +
         '<div style="padding:0 16px"><button class="submit" data-tab="publish">我去发一条</button></div>';
     }
     return list.map(function (it) { return cardHTML(it); }).join('');
@@ -247,7 +247,7 @@
     var list = liveOnly().sort(function (a, b) { return a.exp - b.exp; });
     var h = '<div class="sec" style="padding-top:6px"><div class="sec__t">现在去还能拿到</div>' +
       '<div class="sec__m">平均 <b>' + Math.max(1, Math.round(list.reduce(function (n, x) { return n + mins(left(x)); }, 0) / Math.max(1, list.length))) + '</b> 分钟内消失</div></div>';
-    if (!list.length) return h + '<div class="empty"><b>🌙</b>今天都领完了<br>明天 9:00 会有一批新的</div>';
+    if (!list.length) return h + '<div class="empty">' + svgIcon('calendar') + '今天都领完了<br>明天 9:00 会有一批新的</div>';
     h += '<div class="feed">' + list.map(function (it) { return cardHTML(it); }).join('') + '</div>';
     h += '<div class="formnote" style="margin-top:16px">倒计时是真实的：到点自动从列表消失</div>';
     return h;
@@ -300,7 +300,7 @@
     h += '<div class="me__sec"><div class="me__h"><span>Pro</span><span>' + (state.pro ? '已开通' : '未开通') + '</span></div>' +
       '<div class="pro"><div class="pro__t">' + (state.pro ? '你是 Pro 了' : '别在最后一分钟才知道') + '</div>' +
       '<div class="pro__d">' + (state.pro ? '同类发布 10 秒内提醒你，并且永远比别人早 5 分钟看到。' : '开抢提醒、提前 5 分钟、每月省钱报告。学生价 ¥6/月，首月免费。') + '</div>' +
-      '<button class="pro__b ' + (state.pro ? 'on' : '') + '" id="proBtn">' + (state.pro ? '✓ 已开通 · 管理' : '了解 Pro →') + '</button></div></div>';
+      '<button class="pro__b ' + (state.pro ? 'on' : '') + '" id="proBtn">' + (state.pro ? '已开通 · 管理' : '了解 Pro →') + '</button></div></div>';
 
     h += '<div class="me__sec"><div class="me__h"><span>设置</span></div>' +
       '<div class="list-line"><span>开抢提醒</span><div class="switch on" data-switch></div></div>' +
@@ -322,7 +322,7 @@
 
     var h = '<div class="sheet__grab"></div>' +
       '<div class="sheet__art"><span class="big">' + svgIcon(it.icon) + '</span>' +
-      '<button class="sheet__x" data-close aria-label="关闭">✕</button></div>' +
+      '<button class="sheet__x" data-close aria-label="关闭">' + svgIcon('close') + '</button></div>' +
       '<div class="sheet__body">' +
       '<div class="sheet__badges"><span class="tag">' + (CATMAP[it.cat] ? CATMAP[it.cat].name : '好物') + '</span>' +
       (it.badge ? '<span class="tag" style="background:#EFECE2;color:#6B675C">' + it.badge + '</span>' : '') +
@@ -338,7 +338,7 @@
       '<div class="bar"><i style="width:' + (dead ? 0 : Math.max(3, Math.min(100, ms / (it.mins * 60000) * 100))) + '%"></i></div></div>' +
       '<p class="sheet__p">' + esc(it.desc || '发布者没有写更多说明，到了问一声就行。') + '</p>' +
       '<div class="sheet__sub">领取规则</div>' +
-      (it.rules || []).map(function (r) { return '<div class="rule"><i>✓</i><span>' + esc(r) + '</span></div>'; }).join('') +
+      (it.rules || []).map(function (r) { return '<div class="rule"><i></i><span>' + esc(r) + '</span></div>'; }).join('') +
       '<div class="sheet__owner"><div class="claim__art" style="width:34px;height:34px">' + svgIcon(it.icon) + '</div>' +
       '<div><div class="claim__t">' + esc(it.owner) + '</div><div class="claim__m">' + esc(it.badge || '校园用户') + ' · 历史发布 12 次 · 好评 98%</div></div></div>' +
       '</div>' +
