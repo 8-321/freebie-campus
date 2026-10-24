@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>白捡 · 校园免费资源集市</title>
+<meta name="description" content="把校园里被免费送掉的东西收拢在一个地方：食堂余量、社团物料、毕业闲置、活动名额。3 公里内，倒计时，真实库存。">
+<meta name="theme-color" content="#F2EDE2">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="styles.css?v=4">
+</head>
+<body>
+<div class="stage">
+  <aside class="intro">
+    <div class="intro__tag">Campus Freebie Market</div>
+    <div class="brand">
+      <div class="brand__mark">白捡</div>
+      <div>
+        <div class="brand__name">白捡</div>
+        <div class="brand__en">Baijian · Campus</div>
+      </div>
+    </div>
+    <h1>校园里免费的东西，<br>不该被<em>扔掉</em>。</h1>
+    <p>食堂打烊前的余量、社团活动剩的物料、毕业搬不走的绿植、临时空出的名额——它们每天都在发生，却散落在群聊、朋友圈和楼道口。白捡把这些「正在被免费送掉的东西」收拢到一个地方：3 公里内、带倒计时、库存是真的。</p>
+    <div class="stats">
+      <div class="stat"><b id="s1">27</b><span>今日可捡</span></div>
+      <div class="stat"><b>12<span style="font-size:13px">min</span></b><span>平均被领完</span></div>
+      <div class="stat"><b><span style="font-size:13px">¥</span>1284</b><span>人均年省</span></div>
+    </div>
+    <ul class="checks">
+      <li><i>✓</i><span>点分类，下面的列表真的会变</span></li>
+      <li><i>✓</i><span>点卡片，详情从底部滑出，可以领取</span></li>
+      <li><i>✓</i><span>发布一条，它会立刻出现在最上面</span></li>
+    </ul>
+    <div class="intro__foot">
+      对标海外 Freebie 类订阅产品（月订阅收入 $30k），做校园版。<br>
+      单文件前端 + localStorage，源码与 PRD 在 <a id="repoLink" href="#" target="_blank" rel="noopener">GitHub</a>。
+    </div>
+  </aside>
+
+  <div class="device">
+    <div class="app">
+      <header class="topbar" id="topbar"></header>
+      <div class="refresh" id="refresh">↓ 下拉刷新</div>
+      <main class="scroll" id="view"></main>
+      <nav class="tabbar" id="tabbar">
+        <button class="tab on" data-tab="home">
+          <i><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.6 12 3.2l9 7.4"/><path d="M5.4 9.6V20a.9.9 0 0 0 .9.9h11.4a.9.9 0 0 0 .9-.9V9.6"/><path d="M9.8 20.9v-6h4.4v6"/></svg></i>
+          <span>捡漏</span>
+        </button>
+        <button class="tab" data-tab="soon">
+          <i><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12.6" r="8.2"/><path d="M12 8.4v4.4l3 1.8"/><path d="M9.3 2.6h5.4"/></svg></i>
+          <span>快过期</span>
+        </button>
+        <button class="tab tab--pub" data-tab="publish" aria-label="发布">
+          <span class="pubbtn">＋</span>
+        </button>
+        <button class="tab" data-tab="me">
+          <i><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.4" r="3.9"/><path d="M4.6 21c.6-4 3.7-6.2 7.4-6.2s6.8 2.2 7.4 6.2"/></svg></i>
+          <span>我的</span>
+        </button>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<div class="sheet-wrap" id="sheetWrap">
+  <div class="backdrop" data-close></div>
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<div class="modal-wrap" id="proWrap">
+  <div class="backdrop" data-close-pro></div>
+  <div class="modal">
+    <button class="modal__x" data-close-pro>✕</button>
+    <h3>白捡 Pro</h3>
+    <p>免费的东西拼的是速度。Pro 让你在别人看到之前就知道。</p>
+    <ul>
+      <li><i>✦</i><span>开抢提醒：有人发布同类物品，10 秒内推你</span></li>
+      <li><i>✦</i><span>提前 5 分钟：Pro 用户先看、先领</span></li>
+      <li><i>✦</i><span>省钱账单：每月告诉你省了多少、扔了多少</span></li>
+      <li><i>✦</i><span>无广告，不推销</span></li>
+    </ul>
+    <div class="price"><b>¥6</b><span>/ 月 · 学生价 · 随时取消</span></div>
+    <button class="submit" id="proBuy">开通 Pro（首月 ¥0）</button>
+    <div class="formnote" style="margin-top:10px">演示环境不扣款，不会调用真实支付</div>
+  </div>
+</div>
+
+<canvas id="fx"></canvas>
+<div class="toast" id="toast"></div>
+
+<script src="data.js?v=4"></script>
+<script src="app.js?v=4"></script>
+</body>
+</html>
