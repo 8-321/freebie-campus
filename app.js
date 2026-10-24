@@ -29,6 +29,12 @@
     walk: '<circle cx="13.2" cy="4.6" r="1.7"/><path d="M13 8.2 10.6 12l2 2.2-1.4 6M10.6 12 7.4 14.2l-.8 3.6"/>',
     close: '<path d="M6.4 6.4l11.2 11.2M17.6 6.4 6.4 17.6"/>'
   };
+  var CATPHOTO = { food: 'bread', stuff: 'box', slot: 'lecture', book: 'book', help: 'scissors' };
+  /* 真实照片：t=卡片 4:3 / b=详情 16:9 */
+  function photo(it, big) {
+    var src = 'assets/photos/' + (it.photo || 'box') + (big ? '-b' : '-t') + '.jpg';
+    return '<img class="ph" src="' + src + '" alt="" loading="lazy" decoding="async" onerror="this.style.opacity=0">';
+  }
   function svgIcon(name, cls) {
     var p = ICONS[name] || ICONS.box;
     return '<svg class="ic' + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>';
@@ -168,7 +174,7 @@
   function chipsHTML() {
     return '<div class="cats">' + window.CATS.map(function (c) {
       return '<button class="chip ' + (state.cat === c.id ? 'on' : '') + '" data-cat="' + c.id + '">' +
-        svgIcon(c.icon) + '<span>' + c.name + '</span>' +
+        '<span>' + c.name + '</span>' +
         '<span style="opacity:.5;font-size:10.5px">' + catCount(c.id) + '</span></button>';
     }).join('') + '</div>';
   }
@@ -176,7 +182,7 @@
   function miniHTML(it) {
     var p = pct(it);
     return '<button class="mini" data-open="' + it.id + '">' +
-      '<div class="mini__art">' + svgIcon(it.icon) + '</div>' +
+      '<div class="mini__art">' + photo(it) + '</div>' +
       '<div class="mini__t">' + esc(it.title) + '</div>' +
       '<div class="mini__f"><span>剩 ' + it.stock + ' 份</span><span class="mini__cd" data-exp="' + it.exp + '">' + short(left(it)) + '</span></div>' +
       '<div class="bar"><i class="' + (p < 26 ? 'hot' : '') + '" style="width:' + p + '%"></i></div>' +
@@ -193,10 +199,10 @@
     if (!dead && ms < 30 * 60000) tags += '<span class="tag hot">快过期</span>';
     if (it.badge === '官方' || it.badge === '商家认证') tags += '<span class="tag" style="background:#EFECE2;color:#6B675C">' + it.badge + '</span>';
     return '<button class="card ' + (dead || it.stock <= 0 ? 'gone' : '') + (withNew ? ' card--new' : '') + '" data-open="' + it.id + '">' +
-      '<div class="card__art">' + svgIcon(it.icon) + '</div>' +
+      '<div class="card__art">' + photo(it) + '</div>' +
       '<div class="card__body">' +
       '<div class="card__t">' + esc(it.title) + '</div>' +
-      '<div class="card__m">' + esc(it.place) + '<span class="sep"></span>' + (it.dist > 0 ? it.dist + ' m' : '线上') + '</div>' +
+      '<div class="card__m">' + esc(it.place) + (it.dist > 0 ? '<span class="sep"></span>' + it.dist + ' m' : '') + '</div>' +
       '<div class="card__f">' + tags + '<span class="card__go" data-exp="' + it.exp + '">' + short(ms) + ' →</span></div>' +
       '</div></button>';
   }
@@ -260,7 +266,7 @@
     return '<form class="form" id="pubForm">' +
       '<div class="field"><label>这是什么</label><input name="title" maxlength="26" placeholder="例：社团活动剩的帆布袋 20 个" required></div>' +
       '<div class="field"><label>类型</label><div class="pick" id="catPick">' +
-      cats.map(function (c) { return '<button type="button" data-pubcat="' + c.id + '" class="' + (state.pubCat === c.id ? 'on' : '') + '">' + svgIcon(c.icon) + c.name + '</button>'; }).join('') +
+      cats.map(function (c) { return '<button type="button" data-pubcat="' + c.id + '" class="' + (state.pubCat === c.id ? 'on' : '') + '">' + c.name + '</button>'; }).join('') +
       '</div></div>' +
       '<div class="field"><label>在哪拿</label><input name="place" maxlength="30" placeholder="例：二食堂门口 / 3 号宿舍楼下"></div>' +
       '<div class="field"><label>有多少份</label><input name="stock" type="number" min="1" max="99" value="5" inputmode="numeric"></div>' +
@@ -289,7 +295,7 @@
       h += '<div class="empty" style="padding:26px 20px">' + svgIcon('box') + '还没领过东西<br>首页那些都是真的，去拿一个</div>';
     } else {
       h += state.claims.slice(0, 8).map(function (c) {
-        return '<div class="claim"><div class="claim__art">' + svgIcon(c.icon || 'box') + '</div>' +
+        return '<div class="claim"><div class="claim__art">' + photo(c) + '</div>' +
           '<div><div class="claim__t">' + esc(c.title) + '</div>' +
           '<div class="claim__m">' + new Date(c.at).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' · 省 ¥' + c.value + '</div></div>' +
           '<div class="code">' + esc(c.code) + '</div></div>';
@@ -321,7 +327,7 @@
     var label = c ? '已领取 · ' + c.code : dead ? '已结束' : it.stock <= 0 ? '已领完' : '立即领取';
 
     var h = '<div class="sheet__grab"></div>' +
-      '<div class="sheet__art"><span class="big">' + svgIcon(it.icon) + '</span>' +
+      '<div class="sheet__art">' + photo(it, true) +
       '<button class="sheet__x" data-close aria-label="关闭">' + svgIcon('close') + '</button></div>' +
       '<div class="sheet__body">' +
       '<div class="sheet__badges"><span class="tag">' + (CATMAP[it.cat] ? CATMAP[it.cat].name : '好物') + '</span>' +
@@ -339,7 +345,7 @@
       '<p class="sheet__p">' + esc(it.desc || '发布者没有写更多说明，到了问一声就行。') + '</p>' +
       '<div class="sheet__sub">领取规则</div>' +
       (it.rules || []).map(function (r) { return '<div class="rule"><i></i><span>' + esc(r) + '</span></div>'; }).join('') +
-      '<div class="sheet__owner"><div class="claim__art" style="width:34px;height:34px">' + svgIcon(it.icon) + '</div>' +
+      '<div class="sheet__owner"><div class="claim__art claim__ini" style="width:34px;height:34px">' + esc(it.owner.slice(0, 1)) + '</div>' +
       '<div><div class="claim__t">' + esc(it.owner) + '</div><div class="claim__m">' + esc(it.badge || '校园用户') + ' · 历史发布 12 次 · 好评 98%</div></div></div>' +
       '</div>' +
       '<div class="sheet__foot"><div class="watchers"><b>' + (it.watched + (c ? 1 : 0)) + '</b> 人正在看这件<br>领到后请按时去拿</div>' +
@@ -369,7 +375,7 @@
     var value = VALUE[it.cat] || 20;
     state.claims.unshift({
       id: id, code: code, at: Date.now(), value: value,
-      title: it.title, icon: it.icon
+      title: it.title, icon: it.icon, photo: it.photo
     });
     state.savedValue += value;
     save();
@@ -390,7 +396,7 @@
     var cat = state.pubCat;
     var it = {
       id: 'u' + Date.now().toString(36),
-      cat: cat, icon: CATMAP[cat] ? CATMAP[cat].icon : 'box',
+      cat: cat, icon: CATMAP[cat] ? CATMAP[cat].icon : 'box', photo: CATPHOTO[cat] || 'box',
       title: title,
       place: String(fd.get('place') || '').trim() || '校园内 · 私信问位置',
       dist: 60 + Math.floor(Math.random() * 380),
@@ -419,7 +425,7 @@
     if (!state.pulled) {
       state.pulled = true;
       state.items.unshift({
-        id: 'n1', cat: 'food', icon: 'bread',
+        id: 'n1', cat: 'food', icon: 'bread', photo: 'bread',
         title: '刚出炉 · 咖啡社练习拉花免费送', place: '学生中心 · 一楼咖啡角', dist: 90,
         stock: 8, total: 8, mins: 25, owner: '咖啡社', badge: '社团认证',
         desc: '今天社团练习，做多了。拿铁、美式都有，自带杯子优先。',
