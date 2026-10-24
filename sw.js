@@ -1,6 +1,6 @@
 /* 白捡 · 离线壳。策略：网络优先，失败回缓存 —— 避免发版后用户永远看到旧版。 */
-const CACHE = 'baijian-v5';
-const CORE = ['./', './index.html', './styles.css?v=5', './app.js?v=5', './data.js?v=5', './manifest.json'];
+const CACHE = 'baijian-v6';
+const CORE = ['./', './index.html', './styles.css?v=6', './app.js?v=6', './data.js?v=6', './manifest.json'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(CORE)).then(() => self.skipWaiting()));
