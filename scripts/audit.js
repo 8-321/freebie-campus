@@ -52,7 +52,7 @@ const URL = process.env.BJ_URL || 'http://127.0.0.1:5199/';
   await page.waitForTimeout(900);
   const claimTxt = await page.textContent('#sheetWrap');
   const btnTxt = (await page.textContent('.claimbtn').catch(() => '')) || '';
-  const gotCode = (await page.$('.claimbtn.done')) !== null && /\d{4}/.test(btnTxt);
+  const gotCode = /已领取/.test(btnTxt) && /[0-9A-Z]{4}/.test(btnTxt);
   const codeMatch = claimTxt.match(/出示码\\s*([A-Z0-9]{4})/);
   report.steps.push({ step: '领取', code_shown: gotCode, code: codeMatch ? codeMatch[1] : null });
   await page.screenshot({ path: path.join(OUT, 'bj-claim.png') });
