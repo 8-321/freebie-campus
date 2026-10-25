@@ -152,7 +152,9 @@
       // 我发布的置顶（刚发要看得到），其余按距离 —— 和「离你最近」标题一致
       var am = a.mine ? 1 : 0, bm = b.mine ? 1 : 0;
       if (am !== bm) return bm - am;
-      return a.dist - b.dist;
+      // 距离是主排序：线上（dist=0）没有距离，统一沉到最底
+      var ad = a.dist > 0 ? a.dist : 1e9, bd = b.dist > 0 ? b.dist : 1e9;
+      return ad - bd;
     });
   }
   function myClaim(id) {
@@ -211,22 +213,43 @@
     else tags += '<span class="tag">剩 ' + it.stock + ' 份</span>';
     if (!dead && ms < 30 * 60000) tags += '<span class="tag hot">快过期</span>';
     if (it.badge === '官方' || it.badge === '商家认证') tags += '<span class="tag" style="background:#EFECE2;color:#6B675C">' + it.badge + '</span>';
+    var distTxt = it.dist > 0 ? it.dist + '<em>m</em>' : '线上';
+    var hotT = (ms > 0 && ms < 30 * 60000) ? ' class="hot"' : '';
     return '<button class="card ' + (dead || it.stock <= 0 ? 'gone' : '') + (withNew ? ' card--new' : '') + '" data-open="' + it.id + '">' +
       '<div class="card__art">' + photo(it) + '</div>' +
       '<div class="card__body">' +
+      '<div class="card__go"><b>' + distTxt + '</b><i' + hotT + ' data-exp="' + it.exp + '">' + short(ms) + '</i></div>' +
       '<div class="card__t">' + esc(it.title) + '</div>' +
-      '<div class="card__m">' + esc(it.place) + (it.dist > 0 ? '<span class="sep"></span>' + it.dist + ' m' : '') + '</div>' +
-      '<div class="card__f">' + tags + '<span class="card__go" data-exp="' + it.exp + '">' + short(ms) + ' →</span></div>' +
+      '<div class="card__m">' + esc(it.place) + '</div>' +
+      '<div class="card__f">' + tags + '</div>' +
       '</div></button>';
   }
 
+  function bandOf(it) {
+    if (!(it.dist > 0)) return 4;
+    if (it.dist <= 300) return 0;
+    if (it.dist <= 600) return 1;
+    if (it.dist <= 1000) return 2;
+    return 3;
+  }
+  var BANDS = ['300 m 内 · 走路 4 分钟', '300–600 m · 走路 8 分钟内', '600 m–1 km · 骑车 4 分钟', '1 km 以外', '线上领取'];
   function feedHTML() {
     var list = filtered();
     if (!list.length) {
       return '<div class="empty">' + svgIcon('box') + '这里现在空着<br>换个分类，或者你自己发一条</div>' +
         '<div style="padding:0 16px"><button class="submit" data-tab="publish">我去发一条</button></div>';
     }
-    return list.map(function (it) { return cardHTML(it); }).join('');
+    var out = '', last = -1;
+    list.forEach(function (it) {
+      var b = bandOf(it);
+      if (b !== last) {
+        var n = list.filter(function (x) { return bandOf(x) === b; }).length;
+        out += '<div class="dband"><b>' + BANDS[b] + '</b><span>' + n + ' 件</span></div>';
+        last = b;
+      }
+      out += cardHTML(it);
+    });
+    return out;
   }
 
   function viewHome() {
@@ -234,6 +257,7 @@
     var stockSum = live.reduce(function (n, x) { return n + x.stock; }, 0);
     var urgent = live.filter(function (x) { return left(x) < 45 * 60000; }).sort(function (a, b) { return a.exp - b.exp; });
     var soonCount = live.filter(function (x) { return left(x) < 30 * 60000; }).length;
+    var near500 = live.filter(function (x) { return x.dist > 0 && x.dist <= 500; }).length;
     var saved = state.savedValue;
 
     var h = '';
@@ -242,8 +266,8 @@
     }
     h += '<div class="hero">' +
       '<div class="hero__k">' + esc(CAMPUSES[state.campus]) + '</div>' +
-      '<div class="hero__h"><b data-count="' + stockSum + '">' + stockSum + '</b>份免费<br>今天还没被领走</div>' +
-      '<div class="hero__p"><span class="pulse"></span>' + soonCount + ' 份在 30 分钟内过期</div>' +
+      '<div class="hero__h"><b data-count="' + near500 + '">' + near500 + '</b>样东西<br>在你 500 米内</div>' +
+      '<div class="hero__p"><span class="pulse"></span>3 公里内还有 ' + stockSum + ' 份 · 按距离排</div>' +
       '<div class="hero__row"><div class="hero__save">本月已省 <b>¥' + saved + '</b></div>' +
       '<div class="hero__go" data-tab="soon">看快过期的 →</div></div></div>';
 
@@ -256,7 +280,7 @@
     }
 
     h += '<div class="sec"><div class="sec__t">' + (state.q ? '搜「' + esc(state.q) + '」' : '离你最近') + '</div>' +
-      '<div class="sec__m">' + filtered().length + ' 件 · 按距离</div></div>';
+      '<div class="sec__m">' + filtered().length + ' 件 · 近的在前</div></div>';
     h += '<div class="feed" id="feedBox">' + feedHTML() + '</div>';
     return h;
   }
@@ -347,9 +371,13 @@
       (it.badge ? '<span class="tag" style="background:#EFECE2;color:#6B675C">' + it.badge + '</span>' : '') +
       (dead ? '<span class="tag hot">已结束</span>' : ms < 30 * 60000 ? '<span class="tag hot">快过期</span>' : '') + '</div>' +
       '<h2 class="sheet__h">' + esc(it.title) + '</h2>' +
+      '<div class="sheet__dist">' +
+      (it.dist > 0
+        ? '<b>' + it.dist + '</b><em>m</em><span>走路 ' + Math.max(1, Math.round(it.dist / 80)) + ' 分钟</span>'
+        : '<b>线上</b><span>链接领取</span>') +
+      '</div>' +
       '<div class="sheet__meta">' +
       '<span>' + svgIcon('pin') + esc(it.place) + '</span>' +
-      '<span>' + svgIcon('walk') + (it.dist > 0 ? it.dist + ' 米 · 走路 ' + Math.max(1, Math.round(it.dist / 80)) + ' 分钟' : '线上领取') + '</span>' +
       '<span>' + svgIcon('box') + '剩 ' + it.stock + ' / ' + it.total + ' 份</span>' +
       '</div>' +
       '<div class="cdbar"><div class="cdbar__top"><span>' + (dead ? '已经结束' : '还能捡的时间') + '</span>' +
@@ -550,7 +578,7 @@
     $$('[data-exp]').forEach(function (el) {
       var exp = +el.getAttribute('data-exp');
       var ms = exp - now;
-      el.textContent = el.classList.contains('mini__cd') || el.classList.contains('card__go') ? short(ms) : fmt(ms);
+      el.textContent = el.classList.contains('mini__cd') || el.tagName === 'I' ? short(ms) : fmt(ms);
       if (ms <= 0) el.style.opacity = '.5';
     });
     if (now - tick._last > 15000) {
